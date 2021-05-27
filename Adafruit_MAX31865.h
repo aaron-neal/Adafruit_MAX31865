@@ -70,8 +70,7 @@ public:
 
   bool begin(max31865_numwires_t x = MAX31865_2WIRE);
 
-  uint8_t readFault(void);
-  uint8_t readFault(boolean b);
+  uint8_t readFault(boolean b = false);
   void clearFault(void);
   uint16_t readRTD();
 
