@@ -77,14 +77,14 @@ bool Adafruit_MAX31865::begin(max31865_numwires_t wires) {
 */
 /**************************************************************************/
 uint8_t Adafruit_MAX31865::readFault(boolean b) {
-  uint8_t t = readRegister8(MAX31856_CONFIG_REG);
+  uint8_t t = readRegister8(MAX31865_CONFIG_REG);
   if (b) {
-    t |= MAX31856_CONFIG_FAULTDETCYCLE;  // trigger automatic fault-detection cycle
-    writeRegister8(MAX31856_CONFIG_REG, t);
+    t |= MAX31865_CONFIG_FAULTDETCYCLE;  // trigger automatic fault-detection cycle
+    writeRegister8(MAX31865_CONFIG_REG, t);
 	delay(5);  // wait for 5ms
   }
 
-  return readRegister8(MAX31856_FAULTSTAT_REG);
+  return readRegister8(MAX31865_FAULTSTAT_REG);
 }
 
 /**************************************************************************/
