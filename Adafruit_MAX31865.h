@@ -79,7 +79,7 @@ public:
   void enable50Hz(bool b);
   void enableBias(bool b);
 
-  float temperature(float RTDnominal, float refResistor);
+  float temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS);
 
 private:
   Adafruit_SPIDevice spi_dev;

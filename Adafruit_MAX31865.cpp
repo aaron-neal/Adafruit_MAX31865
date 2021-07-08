@@ -179,10 +179,10 @@ void Adafruit_MAX31865::setWires(max31865_numwires_t wires) {
     @returns Temperature in C
 */
 /**************************************************************************/
-float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor) {
+float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS = 10) {
   float Z1, Z2, Z3, Z4, Rt, temp;
 
-  Rt = readRTD();
+  Rt = readRTD(biasOnDelayMS);
   Rt /= 32768;
   Rt *= refResistor;
 
