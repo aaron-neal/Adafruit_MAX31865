@@ -72,7 +72,7 @@ public:
 
   uint8_t readFault(boolean b = false);
   void clearFault(void);
-  uint16_t readRTD();
+  uint16_t readRTD(uint8_t biasOnDelayMS);
 
   void setWires(max31865_numwires_t wires);
   void autoConvert(bool b);

@@ -225,10 +225,10 @@ float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor) {
     @return The raw unsigned 16-bit value, NOT temperature!
 */
 /**************************************************************************/
-uint16_t Adafruit_MAX31865::readRTD(void) {
+uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS = 10) {
   clearFault();
   enableBias(true);
-  delay(10);
+  delay(biasOnDelayMS);
   uint8_t t = readRegister8(MAX31865_CONFIG_REG);
   t |= MAX31865_CONFIG_1SHOT;
   writeRegister8(MAX31865_CONFIG_REG, t);
