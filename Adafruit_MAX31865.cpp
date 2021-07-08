@@ -179,7 +179,7 @@ void Adafruit_MAX31865::setWires(max31865_numwires_t wires) {
     @returns Temperature in C
 */
 /**************************************************************************/
-float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS = 10) {
+float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS) {
   float Z1, Z2, Z3, Z4, Rt, temp;
 
   Rt = readRTD(biasOnDelayMS);
@@ -225,7 +225,7 @@ float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_
     @return The raw unsigned 16-bit value, NOT temperature!
 */
 /**************************************************************************/
-uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS = 10) {
+uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS) {
   clearFault();
   enableBias(true);
   delay(biasOnDelayMS);

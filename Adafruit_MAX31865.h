@@ -72,14 +72,14 @@ public:
 
   uint8_t readFault(boolean b = false);
   void clearFault(void);
-  uint16_t readRTD(uint8_t biasOnDelayMS);
+  uint16_t readRTD(uint8_t biasOnDelayMS = 10);
 
   void setWires(max31865_numwires_t wires);
   void autoConvert(bool b);
   void enable50Hz(bool b);
   void enableBias(bool b);
 
-  float temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS);
+  float temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS = 10);
 
 private:
   Adafruit_SPIDevice spi_dev;
