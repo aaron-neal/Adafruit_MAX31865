@@ -68,7 +68,7 @@ public:
                     int8_t spi_clk);
   Adafruit_MAX31865(int8_t spi_cs);
 
-  bool begin(max31865_numwires_t x = MAX31865_2WIRE, bool toogleBias);
+  bool begin(max31865_numwires_t x = MAX31865_2WIRE);
 
   uint8_t readFault(boolean b = false);
   void clearFault(void);
