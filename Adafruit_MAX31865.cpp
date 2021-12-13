@@ -55,7 +55,7 @@ Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs)
     @return True
 */
 /**************************************************************************/
-bool Adafruit_MAX31865::begin(max31865_numwires_t wires,) {
+bool Adafruit_MAX31865::begin(max31865_numwires_t wires) {
   spi_dev.begin();
   setWires(wires);
   readFault(true); // MAX31865 data sheet (page 14) a manual or automatic fault detection cycle must be run at startup 
@@ -112,7 +112,7 @@ void Adafruit_MAX31865::enableBias(bool b) {
     t &= ~MAX31865_CONFIG_BIAS; // disable bias
   }
   writeRegister8(MAX31865_CONFIG_REG, t);
-  
+  bias = b;
 }
 
 /**************************************************************************/
@@ -128,7 +128,9 @@ void Adafruit_MAX31865::autoConvert(bool b) {
   } else {
     t &= ~MAX31865_CONFIG_MODEAUTO; // disable continuous conversion
   }
+
   writeRegister8(MAX31865_CONFIG_REG, t);
+
   if (b && !continuous) {
     if (filter50Hz) {
       delay(70);
