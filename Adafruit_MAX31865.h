@@ -68,7 +68,7 @@ public:
                     int8_t spi_clk);
   Adafruit_MAX31865(int8_t spi_cs);
 
-  bool begin(max31865_numwires_t x = MAX31865_2WIRE);
+  bool begin(max31865_numwires_t x = MAX31865_2WIRE, bool toogleBias);
 
   uint8_t readFault(boolean b = false);
   void clearFault(void);
@@ -83,6 +83,10 @@ public:
 
 private:
   Adafruit_SPIDevice spi_dev;
+
+  bool bias; // bias voltage
+  bool continuous;// continuous conversion
+  bool filter50Hz;// 50Hz filter 
 
   void readRegisterN(uint8_t addr, uint8_t buffer[], uint8_t n);
 

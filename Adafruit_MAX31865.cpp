@@ -55,9 +55,8 @@ Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs)
     @return True
 */
 /**************************************************************************/
-bool Adafruit_MAX31865::begin(max31865_numwires_t wires) {
+bool Adafruit_MAX31865::begin(max31865_numwires_t wires,) {
   spi_dev.begin();
-
   setWires(wires);
   readFault(true); // MAX31865 data sheet (page 14) a manual or automatic fault detection cycle must be run at startup 
   enableBias(false);
@@ -113,6 +112,7 @@ void Adafruit_MAX31865::enableBias(bool b) {
     t &= ~MAX31865_CONFIG_BIAS; // disable bias
   }
   writeRegister8(MAX31865_CONFIG_REG, t);
+  
 }
 
 /**************************************************************************/
@@ -124,11 +124,19 @@ void Adafruit_MAX31865::enableBias(bool b) {
 void Adafruit_MAX31865::autoConvert(bool b) {
   uint8_t t = readRegister8(MAX31865_CONFIG_REG);
   if (b) {
-    t |= MAX31865_CONFIG_MODEAUTO; // enable autoconvert
+    t |= MAX31865_CONFIG_MODEAUTO; // enable continuous conversion
   } else {
-    t &= ~MAX31865_CONFIG_MODEAUTO; // disable autoconvert
+    t &= ~MAX31865_CONFIG_MODEAUTO; // disable continuous conversion
   }
   writeRegister8(MAX31865_CONFIG_REG, t);
+  if (b && !continuous) {
+    if (filter50Hz) {
+      delay(70);
+    } else {
+      delay(60);
+    } 
+  }
+  continuous = b;
 }
 
 /**************************************************************************/
@@ -146,6 +154,7 @@ void Adafruit_MAX31865::enable50Hz(bool b) {
     t &= ~MAX31865_CONFIG_FILT50HZ;
   }
   writeRegister8(MAX31865_CONFIG_REG, t);
+  filter50Hz = b;
 }
 
 /**************************************************************************/
@@ -227,16 +236,26 @@ float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_
 /**************************************************************************/
 uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS) {
   clearFault();
-  enableBias(true);
-  delay(biasOnDelayMS);
-  uint8_t t = readRegister8(MAX31865_CONFIG_REG);
-  t |= MAX31865_CONFIG_1SHOT;
-  writeRegister8(MAX31865_CONFIG_REG, t);
-  delay(65);
+  if (!continuous) {
+    if (!bias) {
+      enableBias(true);
+      delay(biasOnDelayMS);
+    }
+    uint8_t t = readRegister8(MAX31865_CONFIG_REG);
+    t |= MAX31865_CONFIG_1SHOT;
+    writeRegister8(MAX31865_CONFIG_REG, t);
+    if (filter50Hz) {
+      delay(70);
+    } else {
+      delay(60);
+    }
+  }
 
   uint16_t rtd = readRegister16(MAX31865_RTDMSB_REG);
 
-  enableBias(false); // Disable bias current again to reduce selfheating.
+  if (!bias) {
+    enableBias(false); // Disable bias current again to reduce selfheating.
+  }
 
   // remove fault
   rtd >>= 1;
