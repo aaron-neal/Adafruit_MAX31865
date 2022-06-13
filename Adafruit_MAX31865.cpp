@@ -1,13 +1,3 @@
-
-/**************************************************************************/
-/*!
-    @brief Create the interface object using hardware SPI
-    @param spi_cs the SPI CS pin to use along with the default SPI device
-*/
-/**************************************************************************/
-Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs)
-    : spi_dev(spi_cs, 1000000, SPI_BITORDER_MSBFIRST, SPI_MODE1) {}
-	
 	/***************************************************
   This is a library for the Adafruit PT100/P1000 RTD Sensor w/MAX31865
 
