@@ -14,39 +14,58 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "Adafruit_MAX31865.h"
-#ifdef __AVR
-#include <avr/pgmspace.h>
-#elif defined(ESP8266)
-#include <pgmspace.h>
+#ifndef ADAFRUIT_MAX31865_H
+#define ADAFRUIT_MAX31865_H
+
+#define MAX31865_CONFIG_REG 0x00
+#define MAX31865_CONFIG_BIAS 0x80
+#define MAX31865_CONFIG_MODEAUTO 0x40
+#define MAX31865_CONFIG_MODEOFF 0x00
+#define MAX31865_CONFIG_1SHOT 0x20
+#define MAX31865_CONFIG_3WIRE 0x10
+#define MAX31865_CONFIG_24WIRE 0x00
+#define MAX31865_CONFIG_FAULTDETCYCLE 0x84
+#define MAX31865_CONFIG_FAULTSTAT 0x02
+#define MAX31865_CONFIG_FILT50HZ 0x01
+#define MAX31865_CONFIG_FILT60HZ 0x00
+
+#define MAX31865_RTDMSB_REG 0x01
+#define MAX31865_RTDLSB_REG 0x02
+#define MAX31865_HFAULTMSB_REG 0x03
+#define MAX31865_HFAULTLSB_REG 0x04
+#define MAX31865_LFAULTMSB_REG 0x05
+#define MAX31865_LFAULTLSB_REG 0x06
+#define MAX31865_FAULTSTAT_REG 0x07
+
+#define MAX31865_FAULT_HIGHTHRESH 0x80
+#define MAX31865_FAULT_LOWTHRESH 0x40
+#define MAX31865_FAULT_REFINLOW 0x20
+#define MAX31865_FAULT_REFINHIGH 0x10
+#define MAX31865_FAULT_RTDINLOW 0x08
+#define MAX31865_FAULT_OVUV 0x04
+
+#define RTD_A 3.9083e-3
+#define RTD_B -5.775e-7
+
+#if (ARDUINO >= 100)
+#include "Arduino.h"
+#else
+#include "WProgram.h"
 #endif
 
-#include <stdlib.h>
+#include <SPI.h>
 
-/**************************************************************************/
-/*!
-    @brief Create the interface object using software (bitbang) SPI
-    @param spi_cs the SPI CS pin to use
-    @param spi_mosi the SPI MOSI pin to use
-    @param spi_miso the SPI MISO pin to use
-    @param spi_clk the SPI clock pin to use
-*/
-/**************************************************************************/
-//
-Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs, int8_t spi_mosi,
-                                     int8_t spi_miso, int8_t spi_clk)
-    : spi_dev(spi_cs, spi_clk, spi_miso, spi_mosi, 1000000,
-              SPI_BITORDER_MSBFIRST, SPI_MODE1) {}
+typedef enum max31865_numwires {
+  MAX31865_2WIRE = 0,
+  MAX31865_3WIRE = 1,
+  MAX31865_4WIRE = 0
+} max31865_numwires_t;
 
-/**************************************************************************/
-/*!
-    @brief Create the interface object using hardware SPI
-    @param spi_cs the SPI CS pin to use along with the default SPI device
-*/
-/**************************************************************************/
-Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs)
-    : spi_dev(spi_cs, 1000000, SPI_BITORDER_MSBFIRST, SPI_MODE1) {}
+/*! Interface class for the MAX31865 RTD Sensor reader */
+class Adafruit_MAX31865 {
+public:
 
+<<<<<<< Updated upstream
 /**************************************************************************/
 /*!
     @brief Initialize the SPI interface and set the number of RTD wires used
@@ -62,12 +81,13 @@ bool Adafruit_MAX31865::begin(max31865_numwires_t wires) {
   enableBias(false);
   autoConvert(false);
   clearFault();
+=======
+  Adafruit_MAX31865();
+>>>>>>> Stashed changes
 
-  // Serial.print("config: ");
-  // Serial.println(readRegister8(MAX31865_CONFIG_REG), HEX);
-  return true;
-}
+  bool begin(int8_t spi_cs, SPIClass &spi = SPI, max31865_numwires_t x = MAX31865_2WIRE);
 
+<<<<<<< Updated upstream
 /**************************************************************************/
 /*!
     @brief Read the raw 8-bit FAULTSTAT register
@@ -77,19 +97,20 @@ bool Adafruit_MAX31865::begin(max31865_numwires_t wires) {
 uint8_t Adafruit_MAX31865::readFault(void) {
   return readRegister8(MAX31865_FAULTSTAT_REG);
 }
+=======
+  uint8_t readFault(boolean b = false);
+  void clearFault(void);
+  uint16_t readRTD(uint8_t biasOnDelayMS = 10);
 
-/**************************************************************************/
-/*!
-    @brief Clear all faults in FAULTSTAT
-*/
-/**************************************************************************/
-void Adafruit_MAX31865::clearFault(void) {
-  uint8_t t = readRegister8(MAX31865_CONFIG_REG);
-  t &= ~0x2C;
-  t |= MAX31865_CONFIG_FAULTSTAT;
-  writeRegister8(MAX31865_CONFIG_REG, t);
-}
+  void setWires(max31865_numwires_t wires);
+  void autoConvert(bool b);
+  void enable50Hz(bool b);
+  void enableBias(bool b);
+>>>>>>> Stashed changes
 
+  float temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS = 10);
+
+<<<<<<< Updated upstream
 /**************************************************************************/
 /*!
     @brief Enable the bias voltage on the RTD sensor
@@ -268,3 +289,22 @@ void Adafruit_MAX31865::writeRegister8(uint8_t addr, uint8_t data) {
   uint8_t buffer[2] = {addr, data};
   spi_dev.write(buffer, 2);
 }
+=======
+private:
+  SPIClass spi_dev;
+  SPISettings settings;
+  uint8_t cs;
+  bool bias; // bias voltage
+  bool continuous;// continuous conversion
+  bool filter50Hz;// 50Hz filter 
+
+  void readRegisterN(uint8_t addr, uint8_t buffer[], uint8_t n);
+
+  uint8_t readRegister8(uint8_t addr);
+  uint16_t readRegister16(uint8_t addr);
+
+  void writeRegister8(uint8_t addr, uint8_t reg);
+};
+
+#endif
+>>>>>>> Stashed changes

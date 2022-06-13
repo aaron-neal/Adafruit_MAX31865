@@ -24,6 +24,7 @@
 #define MAX31865_CONFIG_1SHOT 0x20
 #define MAX31865_CONFIG_3WIRE 0x10
 #define MAX31865_CONFIG_24WIRE 0x00
+#define MAX31865_CONFIG_FAULTDETCYCLE 0x84
 #define MAX31865_CONFIG_FAULTSTAT 0x02
 #define MAX31865_CONFIG_FILT50HZ 0x01
 #define MAX31865_CONFIG_FILT60HZ 0x00
@@ -52,7 +53,7 @@
 #include "WProgram.h"
 #endif
 
-#include <Adafruit_SPIDevice.h>
+#include <SPI.h>
 
 typedef enum max31865_numwires {
   MAX31865_2WIRE = 0,
@@ -63,25 +64,29 @@ typedef enum max31865_numwires {
 /*! Interface class for the MAX31865 RTD Sensor reader */
 class Adafruit_MAX31865 {
 public:
-  Adafruit_MAX31865(int8_t spi_cs, int8_t spi_mosi, int8_t spi_miso,
-                    int8_t spi_clk);
-  Adafruit_MAX31865(int8_t spi_cs);
 
-  bool begin(max31865_numwires_t x = MAX31865_2WIRE);
+  Adafruit_MAX31865();
 
-  uint8_t readFault(void);
+  bool begin(int8_t spi_cs, SPIClass &spi = SPI, max31865_numwires_t x = MAX31865_2WIRE);
+
+  uint8_t readFault(boolean b = false);
   void clearFault(void);
-  uint16_t readRTD();
+  uint16_t readRTD(uint8_t biasOnDelayMS = 10);
 
   void setWires(max31865_numwires_t wires);
   void autoConvert(bool b);
   void enable50Hz(bool b);
   void enableBias(bool b);
 
-  float temperature(float RTDnominal, float refResistor);
+  float temperature(float RTDnominal, float refResistor, uint8_t biasOnDelayMS = 10);
 
 private:
-  Adafruit_SPIDevice spi_dev;
+  SPIClass spi_dev;
+  SPISettings settings;
+  uint8_t cs;
+  bool bias; // bias voltage
+  bool continuous;// continuous conversion
+  bool filter50Hz;// 50Hz filter 
 
   void readRegisterN(uint8_t addr, uint8_t buffer[], uint8_t n);
 
