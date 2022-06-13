@@ -51,8 +51,10 @@ bool Adafruit_MAX31865::begin(int8_t spi_cs, SPIClass& spi, max31865_numwires_t 
   settings._clock = 1000000;
   settings._bitOrder = MSBFIRST;
   settings._dataMode = SPI_MODE1;
-
   cs = spi_cs;
+  
+  bool result = (readRegister8(MAX31865_CONFIG_REG)) ? true : false; //if config returns as 0, likely no chip 
+
   setWires(wires);
   readFault(true); // MAX31865 data sheet (page 14) a manual or automatic fault detection cycle must be run at startup 
   enableBias(false);
@@ -61,7 +63,7 @@ bool Adafruit_MAX31865::begin(int8_t spi_cs, SPIClass& spi, max31865_numwires_t 
 
   // Serial.print("config: ");
   // Serial.println(readRegister8(MAX31865_CONFIG_REG), HEX);
-  return true;
+  return result;
 }
 
 /**************************************************************************/
