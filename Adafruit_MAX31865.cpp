@@ -48,9 +48,14 @@ bool Adafruit_MAX31865::begin(int8_t spi_cs, SPIClass& spi, max31865_numwires_t 
   spi_dev = spi;
   spi_dev.begin();
 
-  settings._clock = 1000000;
-  settings._bitOrder = MSBFIRST;
-  settings._dataMode = SPI_MODE1;
+  #ifdef ARDUINO_ARCH_STM32
+    settings = SPISettings(1000000, BitOrder::MSBFIRST, SPI_MODE1);
+  #else
+    settings._clock = 1000000;
+    settings._bitOrder = MSBFIRST;
+    settings._dataMode = SPI_MODE1;
+  #endif 
+  
   cs = spi_cs;
   
   bool result = (readRegister8(MAX31865_CONFIG_REG)) ? true : false; //if config returns as 0, likely no chip 
