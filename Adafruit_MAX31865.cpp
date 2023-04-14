@@ -197,10 +197,10 @@ float Adafruit_MAX31865::temperature(float RTDnominal, float refResistor, uint8_
   float Z1, Z2, Z3, Z4, Rt, temp;
 
   Rt = readRTD(biasOnDelayMS);
+  // Serial.printf("Raw ADC: %.8f\n",Rt);
+
   Rt /= 32768;
   Rt *= refResistor;
-
-  // Serial.print("\nResistance: "); Serial.println(Rt, 8);
 
   Z1 = -RTD_A;
   Z2 = RTD_A * RTD_A - (4 * RTD_B);
@@ -243,6 +243,7 @@ uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS) {
   clearFault();
   if (!continuous) {
     if (!bias) {
+      // Serial.printf("Bias ON\n");
       enableBias(true);
       delay(biasOnDelayMS);
     }
@@ -258,8 +259,9 @@ uint16_t Adafruit_MAX31865::readRTD(uint8_t biasOnDelayMS) {
 
   uint16_t rtd = readRegister16(MAX31865_RTDMSB_REG);
 
-  if (!bias) {
+  if (bias) {
     enableBias(false); // Disable bias current again to reduce selfheating.
+    // Serial.printf("Bias OFF\n");
   }
 
   // remove fault
@@ -296,28 +298,12 @@ void Adafruit_MAX31865::readRegisterN(uint8_t addr, uint8_t buffer[],
   digitalWrite(cs, LOW);
   spi_dev.transfer(addr); //write register address
 
-  // Serial.print(F("\tSPIDevice Wrote: "));
-  // Serial.print(F("0x"));
-  // Serial.print(addr, HEX);
-  // Serial.println();
-
   for (size_t i = 0; i < n; i++) {
     buffer[i] = spi_dev.transfer(0x00);  // do the reading
   }
   
   digitalWrite(cs, HIGH);
   spi_dev.endTransaction();
-
-  // Serial.print(F("\tSPIDevice Read: "));
-  // for (uint16_t i = 0; i < n; i++) {
-  //   Serial.print(F("0x"));
-  //   Serial.print(buffer[i], HEX);
-  //   Serial.print(F(", "));
-  //   if (n % 32 == 31) {
-  //     Serial.println();
-  //   }
-  // }
-  // Serial.println();
 }
 
 void Adafruit_MAX31865::writeRegister8(uint8_t addr, uint8_t data) {
@@ -333,15 +319,4 @@ void Adafruit_MAX31865::writeRegister8(uint8_t addr, uint8_t data) {
   
   digitalWrite(cs, HIGH);
   spi_dev.endTransaction();
-
-  // Serial.print(F("\tSPIDevice Wrote: "));
-  // for (uint16_t i = 0; i < 2; i++) {
-  //   Serial.print(F("0x"));
-  //   Serial.print(buffer[i], HEX);
-  //   Serial.print(F(", "));
-  //   if (i % 32 == 31) {
-  //     Serial.println();
-  //   }
-  // }
-  // Serial.println();
 }
